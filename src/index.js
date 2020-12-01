@@ -2,39 +2,35 @@ import React from "react";
 import ReactDOM from "react-dom";
 import CommentDetail from "./CommentDetail";
 import ApprovalCard from "./ApprovalCard";
+import SeasonDisplay from "./SeasonDisplay";
+import Spinner from "./Spinner";
+import App from "./components/App";
 
-// const App = () => {
+class App1 extends React.Component {
+  state = { lat: null, errorMessage: "" };
 
-//   return (
-//     <div className="ui container comments">
-//       <ApprovalCard>
-//         <CommentDetail
-//           author="Alex"
-//           date="Today at 6:00PM"
-//           text="My first blog!!"
-//         />
-//       </ApprovalCard>
-//     </div>
-//   );
-// };
-
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      lat: null,
-    };
-
+  componentDidMount() {
     window.navigator.geolocation.getCurrentPosition(
       (position) => {
         this.setState({ lat: position.coords.latitude });
       },
-      (err) => console.log("error", err)
+      (err) => this.setState({ errorMessage: err.message })
     );
   }
 
+  helperMethod() {
+    if (this.state.errorMessage && !this.state.lat) {
+      return <div>Error: {this.state.errorMessage}</div>;
+    }
+    if (!this.state.errorMessage && this.state.lat) {
+      return <SeasonDisplay lat={this.state.lat} />;
+    }
+
+    return <Spinner message="Please accept location request" />;
+  }
+
   render() {
-    return <div>Hello Therree {this.state.lat}</div>;
+    return <div>{this.helperMethod()}</div>;
   }
 }
 
